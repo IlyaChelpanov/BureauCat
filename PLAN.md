@@ -73,11 +73,11 @@
 
 ### Task 1.4: Pipeline wiring + cost tracking
 **Files:** `IngestionService` (orchestrate), `com/bureaucat/analysis/AnalysisCost.java` + repo, migration `V2__analysis_cost.sql`
-- [ ] V2: `analysis_cost` (id, card_id FK, model, input_tokens, output_tokens, cost_usd, created_at)
-- [ ] Pipeline: upload → detect → analyze → map to DocumentCard (status NEW) → save card + cost row
-- [ ] `POST /api/documents` returns 201 + card JSON
-- [ ] Integration test: multipart upload with mocked analyzer → card in DB with quotes
-- [ ] Commit `feat: analysis pipeline with cost tracking`
+- [x] V2: `analysis_cost` (id, card_id FK, model, input_tokens, output_tokens, cost_usd, created_at)
+- [x] Pipeline: upload → detect → analyze → map to DocumentCard (status NEW) → save card + cost row (prices configurable via `ANTHROPIC_*_COST_PER_MTOK`)
+- [x] `POST /api/documents` returns 201 + card JSON
+- [x] Integration test: multipart upload with mocked analyzer → card in DB with quotes + cost row (`DocumentUploadIT`)
+- [x] Commit `feat: analysis pipeline with cost tracking`
 
 ### Task 1.5: Read endpoints
 **Files:** `com/bureaucat/cards/CardController.java`, DTOs

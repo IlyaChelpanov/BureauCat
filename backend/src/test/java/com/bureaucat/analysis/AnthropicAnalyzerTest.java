@@ -55,9 +55,9 @@ class AnthropicAnalyzerTest {
         final List<List<ContentBlockParam>> calls = new ArrayList<>();
 
         @Override
-        public String complete(String systemPrompt, List<ContentBlockParam> userContent) {
+        public ModelCompletion complete(String systemPrompt, List<ContentBlockParam> userContent) {
             calls.add(userContent);
-            return responses.pop();
+            return new ModelCompletion(responses.pop(), "test-model", 1000, 200);
         }
     }
 
@@ -69,14 +69,19 @@ class AnthropicAnalyzerTest {
         messenger.responses.add(VALID_RESPONSE);
         byte[] pdf = PdfFixtures.pdfWithText("Mahnung: Bitte zahlen Sie 129,90 EUR bis zum 15.06.2026. Kundennummer KD-12345.");
 
-        AnalysisResult result = analyzer.analyze(SourceType.PDF_TEXT, "application/pdf", pdf);
+        AnalysisOutcome outcome = analyzer.analyze(SourceType.PDF_TEXT, "application/pdf", pdf);
 
+        AnalysisResult result = outcome.result();
         assertThat(result.docType()).isEqualTo(DocType.REMINDER_MAHNUNG);
         assertThat(result.deadline()).isEqualTo(LocalDate.of(2026, 6, 15));
         assertThat(result.amountValue()).isEqualByComparingTo(new BigDecimal("129.90"));
         assertThat(result.requiredAction()).isEqualTo(RequiredAction.PAY);
         assertThat(result.confidence()).isEqualTo(Confidence.HIGH);
         assertThat(result.evidenceQuotes()).containsKey("deadline");
+        assertThat(outcome.model()).isEqualTo("test-model");
+        assertThat(outcome.inputTokens()).isEqualTo(1000);
+        assertThat(outcome.outputTokens()).isEqualTo(200);
+        assertThat(outcome.rawAnalysis()).containsEntry("doc_type", "REMINDER_MAHNUNG");
         assertThat(messenger.calls).hasSize(1);
     }
 
@@ -85,9 +90,9 @@ class AnthropicAnalyzerTest {
         messenger.responses.add("```json\n" + VALID_RESPONSE + "\n```");
         byte[] pdf = PdfFixtures.pdfWithText("Mahnung über 129,90 EUR, zahlbar bis 15.06.2026, Kundennummer KD-12345.");
 
-        AnalysisResult result = analyzer.analyze(SourceType.PDF_TEXT, "application/pdf", pdf);
+        AnalysisOutcome outcome = analyzer.analyze(SourceType.PDF_TEXT, "application/pdf", pdf);
 
-        assertThat(result.docType()).isEqualTo(DocType.REMINDER_MAHNUNG);
+        assertThat(outcome.result().docType()).isEqualTo(DocType.REMINDER_MAHNUNG);
     }
 
     @Test
@@ -96,12 +101,15 @@ class AnthropicAnalyzerTest {
         messenger.responses.add(VALID_RESPONSE);
         byte[] pdf = PdfFixtures.pdfWithText("Mahnung über 129,90 EUR, zahlbar bis 15.06.2026, Kundennummer KD-12345.");
 
-        AnalysisResult result = analyzer.analyze(SourceType.PDF_TEXT, "application/pdf", pdf);
+        AnalysisOutcome outcome = analyzer.analyze(SourceType.PDF_TEXT, "application/pdf", pdf);
 
-        assertThat(result.confidence()).isEqualTo(Confidence.HIGH);
+        assertThat(outcome.result().confidence()).isEqualTo(Confidence.HIGH);
         assertThat(messenger.calls).hasSize(2);
         // retry call carries the original content plus an error note
         assertThat(messenger.calls.get(1)).hasSize(messenger.calls.get(0).size() + 1);
+        // usage accumulates across both calls
+        assertThat(outcome.inputTokens()).isEqualTo(2000);
+        assertThat(outcome.outputTokens()).isEqualTo(400);
     }
 
     @Test
@@ -122,9 +130,9 @@ class AnthropicAnalyzerTest {
         messenger.responses.add(VALID_RESPONSE);
         byte[] pdf = PdfFixtures.pdfWithText("Mahnung über 129,90 EUR, zahlbar bis 15.06.2026, Kundennummer KD-12345.");
 
-        AnalysisResult result = analyzer.analyze(SourceType.PDF_TEXT, "application/pdf", pdf);
+        AnalysisOutcome outcome = analyzer.analyze(SourceType.PDF_TEXT, "application/pdf", pdf);
 
-        assertThat(result.summary()).isNotBlank();
+        assertThat(outcome.result().summary()).isNotBlank();
         assertThat(messenger.calls).hasSize(2);
     }
 

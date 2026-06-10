@@ -5,6 +5,7 @@ import com.anthropic.models.messages.ContentBlockParam;
 import com.anthropic.models.messages.ImageBlockParam;
 import com.anthropic.models.messages.TextBlockParam;
 import com.bureaucat.cards.SourceType;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
@@ -26,6 +27,7 @@ import java.io.UncheckedIOException;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -52,29 +54,40 @@ public class AnthropicAnalyzer implements DocumentAnalyzer {
     }
 
     @Override
-    public AnalysisResult analyze(SourceType sourceType, String contentType, byte[] content) {
+    public AnalysisOutcome analyze(SourceType sourceType, String contentType, byte[] content) {
         String system = AnalysisPrompt.system(summaryLanguage);
         List<ContentBlockParam> userContent = buildUserContent(sourceType, contentType, content);
 
-        String response = messenger.complete(system, userContent);
+        AnthropicMessenger.ModelCompletion completion = messenger.complete(system, userContent);
         try {
-            return parseAndValidate(response);
+            return outcome(completion, completion.inputTokens(), completion.outputTokens());
         } catch (Exception firstError) {
             List<ContentBlockParam> retryContent = new ArrayList<>(userContent);
-            retryContent.add(text(AnalysisPrompt.retryNote(response, firstError.getMessage())));
-            String retryResponse = messenger.complete(system, retryContent);
+            retryContent.add(text(AnalysisPrompt.retryNote(completion.text(), firstError.getMessage())));
+            AnthropicMessenger.ModelCompletion retry = messenger.complete(system, retryContent);
+            long totalIn = completion.inputTokens() + retry.inputTokens();
+            long totalOut = completion.outputTokens() + retry.outputTokens();
             try {
-                return parseAndValidate(retryResponse);
+                return outcome(retry, totalIn, totalOut);
             } catch (Exception retryError) {
                 throw new AnalysisException(
                         "Model returned invalid analysis result after retry: " + retryError.getMessage(),
-                        retryResponse, retryError);
+                        retry.text(), retryError);
             }
         }
     }
 
-    private AnalysisResult parseAndValidate(String response) throws IOException {
-        AnalysisResult result = objectMapper.readValue(stripFences(response), AnalysisResult.class);
+    private AnalysisOutcome outcome(AnthropicMessenger.ModelCompletion completion,
+                                    long inputTokens, long outputTokens) throws IOException {
+        String json = stripFences(completion.text());
+        AnalysisResult result = parseAndValidate(json);
+        Map<String, Object> raw = objectMapper.readValue(json, new TypeReference<Map<String, Object>>() {
+        });
+        return new AnalysisOutcome(result, raw, completion.model(), inputTokens, outputTokens);
+    }
+
+    private AnalysisResult parseAndValidate(String json) throws IOException {
+        AnalysisResult result = objectMapper.readValue(json, AnalysisResult.class);
         var violations = validator.validate(result);
         if (!violations.isEmpty()) {
             String message = violations.stream()

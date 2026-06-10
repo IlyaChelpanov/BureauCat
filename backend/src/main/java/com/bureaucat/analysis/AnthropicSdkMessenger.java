@@ -28,7 +28,7 @@ public class AnthropicSdkMessenger implements AnthropicMessenger {
     }
 
     @Override
-    public String complete(String systemPrompt, List<ContentBlockParam> userContent) {
+    public ModelCompletion complete(String systemPrompt, List<ContentBlockParam> userContent) {
         MessageCreateParams params = MessageCreateParams.builder()
                 .model(model)
                 .maxTokens(8192L)
@@ -37,10 +37,12 @@ public class AnthropicSdkMessenger implements AnthropicMessenger {
                 .addUserMessageOfBlockParams(userContent)
                 .build();
         Message response = client().messages().create(params);
-        return response.content().stream()
+        String text = response.content().stream()
                 .flatMap(block -> block.text().stream())
                 .map(TextBlock::text)
                 .collect(Collectors.joining());
+        return new ModelCompletion(text, model,
+                response.usage().inputTokens(), response.usage().outputTokens());
     }
 
     private AnthropicClient client() {
