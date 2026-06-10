@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: bureaucat
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/bureaucat}
+    username: ${DB_USER:bureaucat}
+    password: ${DB_PASSWORD:bureaucat}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
