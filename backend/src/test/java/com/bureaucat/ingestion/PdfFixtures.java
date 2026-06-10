@@ -10,12 +10,12 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 /** Generates minimal PDF fixtures so no binary files live in the repo. */
-final class PdfFixtures {
+public final class PdfFixtures {
 
     private PdfFixtures() {
     }
 
-    static byte[] pdfWithText(String text) throws IOException {
+    public static byte[] pdfWithText(String text) throws IOException {
         try (PDDocument document = new PDDocument()) {
             PDPage page = new PDPage();
             document.addPage(page);
@@ -32,7 +32,7 @@ final class PdfFixtures {
         }
     }
 
-    static byte[] pdfWithoutText() throws IOException {
+    public static byte[] pdfWithoutText() throws IOException {
         try (PDDocument document = new PDDocument()) {
             document.addPage(new PDPage());
             ByteArrayOutputStream out = new ByteArrayOutputStream();

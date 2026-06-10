@@ -64,12 +64,12 @@
 
 ### Task 1.3: DocumentAnalyzer interface + Anthropic impl
 **Files:** `com/bureaucat/analysis/` (`DocumentAnalyzer.java`, `AnalysisResult.java` record + nested records, `AnthropicAnalyzer.java`, `AnalysisPrompt.java`; props `anthropic.api-key`, `anthropic.model`)
-- [ ] `AnalysisResult` record mirroring card fields + `confidenceReasoning`; jackson + bean validation
-- [ ] Prompt per architecture.md §4: strict JSON only, russian summary (configurable), null for unknown, evidence quotes mandatory, LOW confidence rules
-- [ ] `AnthropicAnalyzer`: PDF_TEXT → text block; PDF_SCAN → render pages to images (PDFBox) → image blocks; IMAGE → image block
-- [ ] Invalid JSON → one retry with error appended, then fail saving raw response
-- [ ] Unit tests: parse valid mock response; invalid → retry → fail path (mock HTTP)
-- [ ] Commit `feat: anthropic document analyzer`
+- [x] `AnalysisResult` record mirroring card fields + `confidenceReasoning`; jackson + bean validation
+- [x] Prompt per architecture.md §4: strict JSON only, russian summary (configurable via `SUMMARY_LANGUAGE`), null for unknown, evidence quotes mandatory, LOW confidence rules
+- [x] `AnthropicAnalyzer`: PDF_TEXT → text block; PDF_SCAN → render pages to images (PDFBox) → image blocks; IMAGE → image block (official `com.anthropic:anthropic-java` SDK, default model `claude-opus-4-8`, adaptive thinking)
+- [x] Invalid JSON → one retry with error appended, then fail saving raw response (`AnalysisException.rawResponse`)
+- [x] Unit tests: parse valid mock response; invalid → retry → fail path (mocked via `AnthropicMessenger` seam instead of HTTP)
+- [x] Commit `feat: anthropic document analyzer`
 
 ### Task 1.4: Pipeline wiring + cost tracking
 **Files:** `IngestionService` (orchestrate), `com/bureaucat/analysis/AnalysisCost.java` + repo, migration `V2__analysis_cost.sql`
