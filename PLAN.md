@@ -57,10 +57,10 @@
 
 ### Task 1.2: Upload endpoint + source type detection
 **Files:** `com/bureaucat/ingestion/` (`DocumentController.java`, `SourceTypeDetector.java`, `IngestionService.java`)
-- [ ] `POST /api/documents` multipart, accept PDF/JPG/PNG, reject others (400); max size config
-- [ ] `SourceTypeDetector`: PDF text layer via PDFBox `PDFTextStripper` (threshold ~50 chars/page avg) → PDF_TEXT, else PDF_SCAN; image → IMAGE. Add PDFBox dep.
-- [ ] Unit tests for detector (small fixture PDFs/images in test resources)
-- [ ] Commit `feat: document upload with source type detection`
+- [x] `POST /api/documents` multipart, accept PDF/JPG/PNG, reject others (400); max size config (`MAX_UPLOAD_SIZE`, default 25MB)
+- [x] `SourceTypeDetector`: PDF text layer via PDFBox `PDFTextStripper` (threshold ~50 chars/page avg) → PDF_TEXT, else PDF_SCAN; image → IMAGE. Add PDFBox dep.
+- [x] Unit tests for detector (fixtures generated in-test via PDFBox — no binaries in repo)
+- [x] Commit `feat: document upload with source type detection`
 
 ### Task 1.3: DocumentAnalyzer interface + Anthropic impl
 **Files:** `com/bureaucat/analysis/` (`DocumentAnalyzer.java`, `AnalysisResult.java` record + nested records, `AnthropicAnalyzer.java`, `AnalysisPrompt.java`; props `anthropic.api-key`, `anthropic.model`)
