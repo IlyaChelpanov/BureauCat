@@ -1,0 +1,7 @@
+package com.bureaucat.cards;
+
+public enum DocType {
+    INVOICE, REMINDER_MAHNUNG, INSURANCE, TAX,
+    BANK, RENTAL, EMPLOYMENT, MEDICAL, SCHOOL_KITA,
+    GOVERNMENT, CONTRACT, INFO_ONLY, OTHER
+}

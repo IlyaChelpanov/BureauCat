@@ -51,9 +51,9 @@
 
 ### Task 1.1: Domain model + persistence
 **Files:** `backend/src/main/java/com/bureaucat/cards/` (`DocumentCard.java` entity, enums `SourceType`, `DocType`, `RequiredAction`, `Urgency`, `Confidence`, `CardStatus`, `DocumentCardRepository.java`)
-- [ ] JPA entity mapping V1 table; JSONB fields via `@JdbcTypeCode(SqlTypes.JSON)`; enums `@Enumerated(STRING)`
-- [ ] Repository test (Testcontainers): save + findById roundtrip incl. JSONB
-- [ ] Commit `feat: document card entity and repository`
+- [x] JPA entity mapping V1 table; JSONB fields via `@JdbcTypeCode(SqlTypes.JSON)`; enums `@Enumerated(STRING)`
+- [x] Repository test (Testcontainers): save + findById roundtrip incl. JSONB
+- [x] Commit `feat: document card entity and repository`
 
 ### Task 1.2: Upload endpoint + source type detection
 **Files:** `com/bureaucat/ingestion/` (`DocumentController.java`, `SourceTypeDetector.java`, `IngestionService.java`)
