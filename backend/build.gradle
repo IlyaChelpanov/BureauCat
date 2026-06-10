@@ -7,6 +7,9 @@ plugins {
 group = 'com.bureaucat'
 version = '0.0.1-SNAPSHOT'
 
+// Docker Engine 29+ requires API >= 1.44; Boot-managed Testcontainers 1.21.0 speaks 1.32
+ext['testcontainers.version'] = '1.21.4'
+
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(21)

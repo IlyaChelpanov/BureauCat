@@ -24,13 +24,13 @@
 ### Task 0.2: Postgres in docker-compose
 **Files:** `docker-compose.yml` (root)
 - [x] compose: postgres:16 service, env vars, volume, port 5432, healthcheck; app service commented out until Dockerfile exists
-- [ ] Verify: `docker compose up -d postgres` → container healthy — **BLOCKED: Docker Desktop won't start headless, user must start it manually**
+- [x] Verify: `docker compose up -d postgres` → container healthy
 
 ### Task 0.3: Flyway first migration
 **Files:** `backend/src/main/resources/db/migration/V1__create_document_card.sql`
 - [x] V1 migration: `document_card` table per architecture.md §3 (enums as text + CHECK constraints, simpler with JPA)
 - [x] Integration test: Testcontainers Postgres, context loads, Flyway applies (test class `BureauCatApplicationIT`)
-- [ ] Verify: `.\gradlew.bat test` green — **BLOCKED on Docker (Testcontainers); test code compiles**
+- [x] Verify: `.\gradlew.bat test` green (required Testcontainers 1.21.4 bump for Docker Engine 29 API ≥1.44)
 - [x] Commit `feat: spring boot app with postgres and flyway baseline`
 
 ### Task 0.4: Frontend proxy + cleanup
@@ -38,14 +38,14 @@
 - [x] vite.config.ts: proxy `/api` → `http://localhost:8080`
 - [x] Strip Vite demo content from App.tsx; minimal page calling `GET /api/health` (trivial backend `HealthController` returning `{"status":"ok"}` under `/api/health`)
 - [x] Install Tailwind CSS v4 + TanStack Query now (avoid rework in Phase 2)
-- [ ] Verify: backend run + `npm run dev` → page shows backend status — **BLOCKED on Docker (backend needs postgres); frontend prod build green**
+- [x] Verify: backend run + `npm run dev` → `/api/health` via Vite proxy returns `{"status":"ok"}`
 - [x] Commit `feat: frontend proxy and health check page`
 
 ### Task 0.5: CI
 **Files:** `.github/workflows/ci.yml`
 - [x] GitHub Actions: backend `gradlew build` (ubuntu-latest, docker available for Testcontainers), frontend `npm ci && npm run build`
 - [x] Commit `ci: build and test workflow`
-- [ ] Mark Phase 0 done in architecture.md §8 — after Docker verify steps pass
+- [x] Mark Phase 0 done in architecture.md §8
 
 ## Phase 1 — Analysis pipeline (core)
 
