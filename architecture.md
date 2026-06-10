@@ -10,7 +10,7 @@
 
 ## 2. Стек и архитектурные решения
 
-**Backend:** Java 21, Spring Boot 3.x, Maven. Модульный монолит — никаких микросервисов: один деплоймент, разделение на пакеты по доменам (`ingestion`, `analysis`, `storage`, `integrations`, `cards`). Микросервисы — осознанно нет: solo-проект, преждевременная сложность.
+**Backend:** Java 21, Spring Boot 3.x, Gradle. Модульный монолит — никаких микросервисов: один деплоймент, разделение на пакеты по доменам (`ingestion`, `analysis`, `storage`, `integrations`, `cards`). Микросервисы — осознанно нет: solo-проект, преждевременная сложность.
 
 **Frontend:** React 18 + TypeScript + Vite, Tailwind CSS, TanStack Query для серверного состояния. Без Redux — состояния мало.
 
